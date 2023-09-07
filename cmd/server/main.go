@@ -2,40 +2,24 @@ package main
 
 import (
 	"fmt"
+	"github.com/MorZLE/metrick/internal/handlers"
+	"github.com/MorZLE/metrick/internal/services"
+	"github.com/MorZLE/metrick/internal/storages"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
 func main() {
-	UpServer()
 
+	repo := storages.Storage{}
+	logic := services.Service{Storage: repo}
+	h := handlers.Handler{Logic: logic}
+	UpServer(h)
 }
 
-type Metric struct {
-	metric string
-	name   string
-	value  string
-}
-
-func updatePage(res http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-
-	metric := vars["metric"]
-	if err != nill {
-		res.WriteHeader(http.StatusNotFound)
-	}
-	if metric != "gauge" || "counter" {
-		res.WriteHeader(http.StatusBadRequest)
-	}
-	name := vars["name"]
-	value := vars["value"]
-	m := Metric{metric, name, value}
-	fmt.Println(metric, name, value)
-}
-
-func UpServer() {
+func UpServer(h handlers.Handler) {
 	router := mux.NewRouter()
-	router.HandleFunc(`/update/{metric}/{name}/{value}`, updatePage)
+	router.HandleFunc(`/update/{metric}/{name}/{value}`, h.UpdatePage)
 	http.Handle("/", router)
 
 	err := http.ListenAndServe(`:8080`, nil)

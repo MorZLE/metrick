@@ -26,7 +26,7 @@ func (s Service) ProcessingMetrick(vars map[string]string) error {
 		return ErrStatusNotFound
 	}
 	if metric != "gauge" && metric != "counter" {
-		return errors.New("http.StatusBadRequest")
+		return ErrBadRequest
 	}
 	valueFloat, err := strconv.ParseFloat(value, 64)
 	if err != nil {

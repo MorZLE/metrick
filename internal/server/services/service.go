@@ -2,24 +2,13 @@ package services
 
 import (
 	"errors"
+	"github.com/MorZLE/metrick/internal/server"
 	"github.com/MorZLE/metrick/internal/server/storages"
 	"strconv"
 )
 
 func NewService(s storages.MemStorage) Service {
 	return Service{Storage: s}
-}
-
-type Gauge struct {
-	Metric string
-	Name   string
-	Value  float64
-}
-
-type Counter struct {
-	Metric string
-	Name   string
-	Value  float64
 }
 
 type Service struct {
@@ -41,10 +30,10 @@ func (s Service) ProcessingMetrick(vars map[string]string) error {
 		return errors.New("http.StatusBadRequest")
 	}
 	if metric != "counter" {
-		s.Storage.AddCounter(Counter{metric, name, valueFloat})
+		s.Storage.AddCounter(server.Gauge{Metric: metric, Name: name, Value: valueFloat})
 	}
 	if metric != "gauge" {
-		s.Storage.AddGauge(Counter{metric, name, valueFloat})
+		s.Storage.AddGauge(server.Gauge{Metric: metric, Name: name, Value: valueFloat})
 	}
 	return nil
 

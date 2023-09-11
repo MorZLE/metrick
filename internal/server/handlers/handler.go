@@ -21,6 +21,7 @@ func (h Handler) UpServer() {
 	if err == nil {
 		panic(fmt.Errorf("ошибка запуска сервера: %d", err))
 	}
+	fmt.Println("Сервер запущен")
 }
 
 func (h Handler) routs() {
@@ -33,7 +34,9 @@ func (h Handler) UpdatePage(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	err := h.Logic.ProcessingMetrick(vars)
 	if err != nil {
-		res.WriteHeader(http.StatusBadRequest)
+		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
+	fmt.Println("Что то пришло")
 	res.WriteHeader(http.StatusOK)
 }

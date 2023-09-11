@@ -22,7 +22,6 @@ func (h Handler) UpServer() {
 	if err == nil {
 		panic(fmt.Errorf("ошибка запуска сервера: %d", err))
 	}
-	fmt.Println("Сервер запущен")
 }
 
 func (h Handler) routs() {
@@ -45,6 +44,5 @@ func (h Handler) UpdatePage(res http.ResponseWriter, req *http.Request) {
 
 		return
 	}
-	fmt.Println("Что то пришло")
 	res.WriteHeader(http.StatusOK)
 }

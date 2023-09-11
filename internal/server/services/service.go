@@ -7,6 +7,9 @@ import (
 	"strconv"
 )
 
+var ErrBadRequest error = errors.New("BadRequest")
+var ErrStatusNotFound error = errors.New("StatusNotFound")
+
 func NewService(s storages.MemStorage) Service {
 	return Service{Storage: s}
 }
@@ -20,14 +23,14 @@ func (s Service) ProcessingMetrick(vars map[string]string) error {
 	name := vars["name"]
 	value := vars["value"]
 	if metric == "" {
-		return errors.New("http.StatusNotFound")
+		return ErrStatusNotFound
 	}
 	if metric != "gauge" && metric != "counter" {
 		return errors.New("http.StatusBadRequest")
 	}
 	valueFloat, err := strconv.ParseFloat(value, 16)
 	if err != nil {
-		return errors.New("http.StatusBadRequest")
+		return ErrBadRequest
 	}
 	if metric != "counter" {
 		s.Storage.AddCounter(server.Gauge{Metric: metric, Name: name, Value: valueFloat})

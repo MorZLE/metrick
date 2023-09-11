@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/MorZLE/metrick/internal/server/services"
 	"github.com/gorilla/mux"
@@ -34,7 +35,14 @@ func (h Handler) UpdatePage(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	err := h.Logic.ProcessingMetrick(vars)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		if errors.Is(err, services.ErrBadRequest) {
+			http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+
+		}
+		if errors.Is(err, services.ErrStatusNotFound) {
+			http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+
 		return
 	}
 	fmt.Println("Что то пришло")

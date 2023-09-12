@@ -3,22 +3,21 @@ package storages
 import "github.com/MorZLE/metrick/internal/server"
 
 func NewStorage() MemStorage {
-	return MemStorage{make(map[string]float64)}
+	mC := make(map[string]int)
+	mG := make(map[string]float64)
+	return MemStorage{mCounter: mC, mGouge: mG}
 }
 
 type MemStorage struct {
-	m map[string]float64
+	mCounter map[string]int
+	mGouge   map[string]float64
 }
 
-func (s *MemStorage) AddCounter(v server.Gauge) {
-	_, ok := s.m[v.Name]
-	if ok {
-		s.m[v.Name] = v.Value + s.m[v.Name]
-	} else {
-		s.m[v.Name] = v.Value
-	}
+func (s *MemStorage) AddCounter(v server.Counter) {
+	s.mCounter[v.Name] += v.Value
+
 }
 
 func (s *MemStorage) AddGauge(v server.Gauge) {
-	s.m[v.Name] = v.Value
+	s.mGouge[v.Name] = v.Value
 }

@@ -8,6 +8,11 @@ func NewStorage() MemStorage {
 	return MemStorage{mCounter: mC, mGouge: mG}
 }
 
+//type repositories interface {
+//	AddCounter()
+//	AddGauge()
+//}
+
 type MemStorage struct {
 	mCounter map[string]int
 	mGouge   map[string]float64

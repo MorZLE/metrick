@@ -21,33 +21,26 @@ const pollInterval = 2
 const reportInterval = 10
 
 func (s *Service) UpClient() {
-	for {
-		update := func(at time.Time) { s.Metric.UpdateMetric() }
-		tickerU := time.NewTicker(pollInterval * time.Second)
-		go func() {
-			for {
-				at := <-tickerU.C
-				update(at)
-			}
-		}()
+	s.UpdateMetric()
+	s.SendRequest()
+}
 
-		request := func(at time.Time) { s.SendRequest() }
-		tickerR := time.NewTicker(reportInterval * time.Second)
-		go func() {
-			for {
-				at := <-tickerR.C
-				request(at)
-			}
-		}()
+func (s *Service) UpdateMetric() {
+	for {
+		time.Sleep(pollInterval * time.Second)
+		s.Metric.UpdateMetric()
 	}
 }
 
 func (s *Service) SendRequest() {
-	for k, v := range s.Metric.MGauge {
-		s.Handler.Request("Gauge", k, fmt.Sprint(v))
-	}
-	for k, v := range s.Metric.MCounter {
-		s.Handler.Request("Counter", k, strconv.Itoa(v))
+	for {
+		time.Sleep(reportInterval * time.Second)
+		for k, v := range s.Metric.MGauge {
+			s.Handler.Request("Gauge", k, fmt.Sprint(v))
+		}
+		for k, v := range s.Metric.MCounter {
+			s.Handler.Request("Counter", k, strconv.Itoa(v))
+		}
 	}
 
 }

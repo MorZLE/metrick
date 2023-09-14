@@ -1,8 +1,10 @@
 package services
 
 import (
+	"fmt"
 	"github.com/MorZLE/metrick/internal/client/handlers"
 	"github.com/MorZLE/metrick/internal/client/storages"
+	"strconv"
 	"time"
 )
 
@@ -20,18 +22,32 @@ const reportInterval = 10
 
 func (s *Service) UpClient() {
 	for {
-		time.Sleep(pollInterval * time.Second)
-		s.Metric.UpdateMetric()
-		time.Sleep(reportInterval * time.Second)
-		s.SendRequest()
+		update := func(at time.Time) { s.Metric.UpdateMetric() }
+		tickerU := time.NewTicker(pollInterval * time.Second)
+		go func() {
+			for {
+				at := <-tickerU.C
+				update(at)
+			}
+		}()
+
+		request := func(at time.Time) { s.SendRequest() }
+		tickerR := time.NewTicker(reportInterval * time.Second)
+		go func() {
+			for {
+				at := <-tickerR.C
+				request(at)
+			}
+		}()
 	}
 }
 
 func (s *Service) SendRequest() {
-	for k, v := range s.Metric.Met {
-		s.Handler.Request()
-
+	for k, v := range s.Metric.MGauge {
+		s.Handler.Request("Gauge", k, fmt.Sprint(v))
 	}
-	s.Handler.Request(s.Metric.RandomValue.Metric, s.Metric.RandomValue.Name, s.Metric.RandomValue.Value)
-	s.Handler.Request(s.Metric.PollCount.Metric, s.Metric.PollCount.Name, s.Metric.PollCount.Value)
+	for k, v := range s.Metric.MCounter {
+		s.Handler.Request("Counter", k, strconv.Itoa(v))
+	}
+
 }

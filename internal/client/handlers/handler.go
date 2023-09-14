@@ -34,7 +34,7 @@ func (h Handler) Request(metric string, name string, val string) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	defer resp.Body.Close()
 }

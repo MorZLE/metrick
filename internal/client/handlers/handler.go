@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -33,14 +32,9 @@ func (h Handler) Request(metric string, name string, val string) {
 
 	req.Header.Add("Content-Type", "text/plain")
 
-	res, err := client.Do(req)
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-
-		}
-	}(res.Body)
+	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+	defer resp.Body.Close()
 }

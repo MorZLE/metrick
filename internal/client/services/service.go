@@ -21,26 +21,27 @@ const pollInterval = 2
 const reportInterval = 10
 
 func (s *Service) UpClient() {
-	s.UpdateMetric()
-	s.SendRequest()
-}
-
-func (s *Service) UpdateMetric() {
 	for {
-		time.Sleep(pollInterval * time.Second)
-		s.Metric.UpdateMetric()
+		startTime := time.Now()
+		for {
+			if time.Now().Unix()-startTime.Unix() < reportInterval {
+				s.Metric.UpdateMetric()
+				time.Sleep(pollInterval * time.Second)
+
+			} else {
+				break
+			}
+		}
+		s.SendRequest()
 	}
 }
 
 func (s *Service) SendRequest() {
-	for {
-		time.Sleep(reportInterval * time.Second)
-		for k, v := range s.Metric.MGauge {
-			s.Handler.Request("Gauge", k, fmt.Sprint(v))
-		}
-		for k, v := range s.Metric.MCounter {
-			s.Handler.Request("Counter", k, strconv.Itoa(v))
-		}
+	for k, v := range s.Metric.MGauge {
+		s.Handler.Request("gauge", k, fmt.Sprint(v))
+	}
+	for k, v := range s.Metric.MCounter {
+		s.Handler.Request("counter", k, strconv.Itoa(v))
 	}
 
 }

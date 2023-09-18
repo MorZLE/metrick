@@ -10,6 +10,11 @@ func NewHandler() Handler {
 	return Handler{}
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest
+type HandleRequest interface {
+	Request(metric string, name string, val string)
+}
+
 type Handler struct {
 }
 

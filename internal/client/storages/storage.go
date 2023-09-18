@@ -12,6 +12,13 @@ func NewStorage() Metric {
 	return Metric{MGauge: make(map[string]any), MCounter: make(map[string]int)}
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=MetricInterface
+type MetricInterface interface {
+	UpdateMetric() *Metric
+	GetMGauge() map[string]any
+	GetMCounter() map[string]int
+}
+
 type Metric struct {
 	PollCount server.Counter
 	MGauge    map[string]any
@@ -51,4 +58,12 @@ func (m *Metric) UpdateMetric() *Metric {
 	m.MGauge["RandomValue"] = rand.Float64()
 
 	return m
+}
+
+func (m *Metric) GetMGauge() map[string]any {
+	return m.MGauge
+}
+
+func (m Metric) GetMCounter() map[string]int {
+	return m.MCounter
 }

@@ -37,10 +37,12 @@ func (s *Service) UpClient() {
 }
 
 func (s *Service) SendRequest() {
-	for k, v := range s.Metric.MGauge {
+	mGouge := s.Metric.GetMGauge()
+	for k, v := range mGouge {
 		s.Handler.Request("gauge", k, fmt.Sprint(v))
 	}
-	for k, v := range s.Metric.MCounter {
+	mCounter := s.Metric.GetMCounter()
+	for k, v := range mCounter {
 		s.Handler.Request("counter", k, strconv.Itoa(v))
 	}
 

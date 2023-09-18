@@ -2,29 +2,8 @@ package services
 
 import (
 	"github.com/MorZLE/metrick/internal/server/storages"
-	"reflect"
 	"testing"
 )
-
-func TestNewService(t *testing.T) {
-	type args struct {
-		s storages.MemStorage
-	}
-	tests := []struct {
-		name string
-		args args
-		want Service
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewService(tt.args.s); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewService() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func TestService_ProcessingMetrick(t *testing.T) {
 	type fields struct {
@@ -39,7 +18,76 @@ func TestService_ProcessingMetrick(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "PositiveTest1",
+			fields: fields{
+				Storage: storages.NewStorage(),
+			},
+			args: args{
+				vars: map[string]string{
+					"metric": "gauge",
+					"name":   "test1",
+					"value":  "3.2",
+				}},
+
+			wantErr: false,
+		},
+		{
+			name: "PositiveTest2",
+			fields: fields{
+				Storage: storages.NewStorage(),
+			},
+			args: args{
+				vars: map[string]string{
+					"metric": "counter",
+					"name":   "test2",
+					"value":  "3",
+				}},
+
+			wantErr: false,
+		},
+		{
+			name: " FailTest1_TypeMetric",
+			fields: fields{
+				Storage: storages.NewStorage(),
+			},
+			args: args{
+				vars: map[string]string{
+					"metric": "Gof",
+					"name":   "test3",
+					"value":  "3.2",
+				}},
+
+			wantErr: true,
+		},
+		{
+			name: "FailTest2_NotName",
+			fields: fields{
+				Storage: storages.NewStorage(),
+			},
+			args: args{
+				vars: map[string]string{
+					"metric": "counter",
+					"name":   "",
+					"value":  "3",
+				}},
+
+			wantErr: true,
+		},
+		{
+			name: "FailTest3_NotName",
+			fields: fields{
+				Storage: storages.NewStorage(),
+			},
+			args: args{
+				vars: map[string]string{
+					"metric": "counter",
+					"name":   "test3",
+					"value":  "awd",
+				}},
+
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

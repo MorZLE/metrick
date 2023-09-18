@@ -25,7 +25,7 @@ func (s Service) ProcessingMetrick(vars map[string]string) error {
 	if metric == "" {
 		return ErrStatusNotFound
 	}
-	if metric != "gauge" && metric != "counter" || name == "" {
+	if metric != "gauge" && metric != "counter" {
 		return ErrBadRequest
 	}
 

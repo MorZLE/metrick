@@ -61,20 +61,6 @@ func TestService_ProcessingMetrick(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "FailTest2_NotName",
-			fields: fields{
-				Storage: storages.NewStorage(),
-			},
-			args: args{
-				vars: map[string]string{
-					"metric": "counter",
-					"name":   "",
-					"value":  "3",
-				}},
-
-			wantErr: true,
-		},
-		{
 			name: "FailTest3_NotName",
 			fields: fields{
 				Storage: storages.NewStorage(),

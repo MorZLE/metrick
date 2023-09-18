@@ -27,7 +27,7 @@ func TestService_ProcessingMetrick(t *testing.T) {
 				vars: map[string]string{
 					"metric": "gauge",
 					"name":   "test1",
-					"value":  "3.2",
+					"value":  "3.18675",
 				}},
 
 			wantErr: false,

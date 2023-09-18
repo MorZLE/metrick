@@ -29,14 +29,14 @@ func (s Service) ProcessingMetrick(vars map[string]string) error {
 		return ErrBadRequest
 	}
 
-	if metric != "counter" {
+	if metric == "counter" {
 		value, err := strconv.Atoi(value)
 		if err != nil {
 			return ErrBadRequest
 		}
 		s.Storage.AddCounter(server.Counter{Metric: metric, Name: name, Value: value})
 	}
-	if metric != "gauge" {
+	if metric == "gauge" {
 		valueFloat, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return ErrBadRequest

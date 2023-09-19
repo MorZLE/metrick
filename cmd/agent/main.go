@@ -9,7 +9,7 @@ import (
 func main() {
 	repo := storages.NewStorage()
 	h := handlers.NewHandler()
-	logic := services.NewService(repo, h)
+	logic := services.NewService(&repo, &h)
 
 	logic.UpClient()
 }

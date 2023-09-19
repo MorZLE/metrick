@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-func NewService(s storages.Metric, h handlers.Handler) Service {
+func NewService(s storages.MetricInterface, h handlers.HandleRequest) Service {
 	return Service{Metric: s, Handler: h}
 }
 
 type Service struct {
-	Metric  storages.Metric
-	Handler handlers.Handler
+	Metric  storages.MetricInterface
+	Handler handlers.HandleRequest
 }
 
 const pollInterval = 2

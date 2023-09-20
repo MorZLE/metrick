@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-var ErrBadRequest error = errors.New("BadRequest")
-var ErrStatusNotFound error = errors.New("StatusNotFound")
+var ErrBadRequest = errors.New("BadRequest")
+var ErrStatusNotFound = errors.New("StatusNotFound")
 
 func NewService(s storages.Repositories) Service {
 	return Service{Storage: s}
@@ -84,6 +84,7 @@ func (s Service) GetAllMetrics() string {
 	var b strings.Builder
 
 	b.WriteString("counter")
+	b.WriteByte('\n')
 	b.WriteString("____________")
 	b.WriteByte('\n')
 	for k, v := range counter {
@@ -93,6 +94,7 @@ func (s Service) GetAllMetrics() string {
 		b.WriteByte('\n')
 	}
 	b.WriteString("gouge")
+	b.WriteByte('\n')
 	b.WriteString("____________")
 	b.WriteByte('\n')
 	for k, v := range gouge {

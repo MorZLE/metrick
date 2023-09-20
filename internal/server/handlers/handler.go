@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/MorZLE/metrick/internal/server/services"
-	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -25,27 +26,21 @@ type Handler struct {
 
 func (h Handler) UpServer() {
 	h.routs()
-	err := http.ListenAndServe(`:8080`, nil)
-	if err == nil {
-		panic(fmt.Errorf("ошибка запуска сервера: %d", err))
-	}
+
 }
 
 func (h Handler) routs() {
-	router := chi.NewRouter()
-	router.Post(`/update/{metric}/{name}/{value}`, h.UpdateMetric)
-	router.Get(`/update/{metric}/{name}`, h.ValueMetric)
-	router.Get(`/`, h.ValueMetrics)
+	router := mux.NewRouter()
+	router.HandleFunc(`/update/{metric}/{name}/{value}`, h.UpdateMetric)
+	router.HandleFunc(`/update/{metric}/{name}`, h.ValueMetric)
+	router.HandleFunc(`/`, h.ValueMetrics)
 	http.Handle("/", router)
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func (h Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
-	vars := make(map[string]string)
-
-	vars["metric"] = chi.URLParam(req, "metric")
-	vars["name"] = chi.URLParam(req, "name")
-	vars["value"] = chi.URLParam(req, "value")
-
+	vars := mux.Vars(req)
+	fmt.Println(vars)
 	err := h.Logic.ProcessingMetric(vars)
 	if err != nil {
 		if errors.Is(err, services.ErrBadRequest) {
@@ -61,10 +56,7 @@ func (h Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
-	vars := make(map[string]string)
-
-	vars["metric"] = chi.URLParam(req, "metric")
-	vars["name"] = chi.URLParam(req, "name")
+	vars := mux.Vars(req)
 	value, err := h.Logic.ValueMetric(vars)
 
 	if err != nil {

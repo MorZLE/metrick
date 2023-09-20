@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestService_ProcessingMetrick(t *testing.T) {
+func TestService_ProcessingMetric(t *testing.T) {
 	type fields struct {
 		Storage storages.MemStorage
 	}
@@ -78,9 +78,9 @@ func TestService_ProcessingMetrick(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Service{
-				Storage: tt.fields.Storage,
+				Storage: &tt.fields.Storage,
 			}
-			if err := s.ProcessingMetrick(tt.args.vars); (err != nil) != tt.wantErr {
+			if err := s.ProcessingMetric(tt.args.vars); (err != nil) != tt.wantErr {
 				t.Errorf("ProcessingMetrick() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

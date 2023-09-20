@@ -12,6 +12,11 @@ func NewService(s storages.MetricInterface, h handlers.HandleRequest) Service {
 	return Service{Metric: s, Handler: h}
 }
 
+type ServiceInterface interface {
+	UpClient()
+	SendRequest()
+}
+
 type Service struct {
 	Metric  storages.MetricInterface
 	Handler handlers.HandleRequest

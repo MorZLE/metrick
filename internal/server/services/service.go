@@ -31,29 +31,27 @@ func (s *Service) ProcessingMetric(vars map[string]string) error {
 	metric := vars["metric"]
 	name := vars["name"]
 	value := vars["value"]
-	if metric == "" {
-		return ErrStatusNotFound
-	}
-	if metric != "gauge" && metric != "counter" {
-		return ErrBadRequest
-	}
 
-	if metric == "counter" {
-		value, err := strconv.Atoi(value)
-		if err != nil {
-			return ErrBadRequest
-		}
-		s.Storage.AddCounter(server.Counter{Metric: metric, Name: name, Value: value})
-	}
-	if metric == "gauge" {
+	switch metric {
+	case "":
+		return ErrStatusNotFound
+	case "gauge":
 		valueFloat, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return ErrBadRequest
 		}
 		s.Storage.AddGauge(server.Gauge{Metric: metric, Name: name, Value: valueFloat})
+	case "counter":
+		valueInt, err := strconv.Atoi(value)
+		if err != nil {
+			return ErrBadRequest
+		}
+		s.Storage.AddCounter(server.Counter{Metric: metric, Name: name, Value: valueInt})
+	default:
+		return ErrBadRequest
 	}
-	return nil
 
+	return nil
 }
 
 func (s *Service) ValueMetric(vars map[string]string) (string, error) {

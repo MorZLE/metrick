@@ -12,8 +12,8 @@ import (
 var ErrBadRequest = errors.New("BadRequest")
 var ErrStatusNotFound = errors.New("StatusNotFound")
 
-func NewService(s *storages.Repositories) Service {
-	return Service{Storage: *s}
+func NewService(s storages.Repositories) Service {
+	return Service{Storage: s}
 }
 
 type ServiceInterface interface {

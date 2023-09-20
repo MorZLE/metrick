@@ -28,8 +28,8 @@ func TestService_ProcessingMetric(t *testing.T) {
 					"metric": "gauge",
 					"name":   "test1",
 					"value":  "3.18675",
-				},
-			},
+				}},
+
 			wantErr: false,
 		},
 		{
@@ -42,12 +42,12 @@ func TestService_ProcessingMetric(t *testing.T) {
 					"metric": "counter",
 					"name":   "test2",
 					"value":  "3",
-				},
-			},
+				}},
+
 			wantErr: false,
 		},
 		{
-			name: "FailTest1_TypeMetric",
+			name: " FailTest1_TypeMetric",
 			fields: fields{
 				Storage: storages.NewStorage(),
 			},
@@ -56,8 +56,8 @@ func TestService_ProcessingMetric(t *testing.T) {
 					"metric": "Gof",
 					"name":   "test3",
 					"value":  "3.2",
-				},
-			},
+				}},
+
 			wantErr: true,
 		},
 		{
@@ -70,21 +70,18 @@ func TestService_ProcessingMetric(t *testing.T) {
 					"metric": "counter",
 					"name":   "test3",
 					"value":  "awd",
-				},
-			},
+				}},
+
 			wantErr: true,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Service{
-				Storage: tt.fields.Storage.Repositories,
+				Storage: &tt.fields.Storage,
 			}
-
-			err := s.ProcessingMetric(tt.args.vars)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ProcessingMetric() error = %v, wantErr %v", err, tt.wantErr)
+			if err := s.ProcessingMetric(tt.args.vars); (err != nil) != tt.wantErr {
+				t.Errorf("ProcessingMetrick() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

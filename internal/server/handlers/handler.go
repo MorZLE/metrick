@@ -40,7 +40,7 @@ func (h Handler) routs() {
 }
 
 func (h Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
-	var vars map[string]string
+	vars := make(map[string]string)
 
 	vars["metric"] = chi.URLParam(req, "metric")
 	vars["name"] = chi.URLParam(req, "name")
@@ -61,7 +61,7 @@ func (h Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
-	var vars map[string]string
+	vars := make(map[string]string)
 
 	vars["metric"] = chi.URLParam(req, "metric")
 	vars["name"] = chi.URLParam(req, "name")

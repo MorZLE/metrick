@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -18,29 +18,22 @@ type HandleRequest interface {
 type Handler struct {
 }
 
-func (h *Handler) Request(metric string, name string, val string) {
-	var b strings.Builder
-	b.WriteString("http://localhost:8080/update/")
-	b.WriteString(metric)
-	b.WriteString("/")
-	b.WriteString(name)
-	b.WriteString("/")
-	b.WriteString(val)
-	uri := b.String()
+func (h *Handler) Request(metric, name, val string) error {
+	uri := fmt.Sprintf("http://localhost:8080/update/%s/%s/%s", metric, name, val)
 
 	client := http.Client{Timeout: 3 * time.Second}
 
 	req, err := http.NewRequest(http.MethodPost, uri, nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	req.Header.Add("Content-Type", "text/plain")
+	req.Header.Set("Content-Type", "text/plain")
 
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
 	if err != nil {
-		panic(err)
+		return err
 	}
+	defer resp.Body.Close()
 
+	return nil
 }

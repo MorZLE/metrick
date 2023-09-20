@@ -32,7 +32,7 @@ func (h *Handler) UpServer() {
 func (h *Handler) routs() {
 	router := mux.NewRouter()
 	router.HandleFunc(`/update/{metric}/{name}/{value}`, h.UpdateMetric)
-	router.HandleFunc(`/update/{metric}/{name}`, h.ValueMetric)
+	router.HandleFunc(`/value/{metric}/{name}`, h.ValueMetric)
 	router.HandleFunc(`/`, h.ValueMetrics)
 	http.Handle("/", router)
 	log.Fatal(http.ListenAndServe(":8080", router))

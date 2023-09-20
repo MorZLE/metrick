@@ -17,7 +17,7 @@ type Repositories interface {
 	GetCounter(name string) (int, error)
 	GetGauge(name string) (float64, error)
 
-	GetAllMetrics() (map[string]int, map[string]float64)
+	GetMetrics() (map[string]int, map[string]float64)
 }
 
 type MemStorage struct {
@@ -49,7 +49,7 @@ func (s *MemStorage) GetGauge(name string) (float64, error) {
 	return 0.0, errors.New("not found")
 }
 
-func (s *MemStorage) GetAllMetrics() (map[string]int, map[string]float64) {
+func (s *MemStorage) GetMetrics() (map[string]int, map[string]float64) {
 	return s.mCounter, s.mGouge
 
 }

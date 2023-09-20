@@ -80,7 +80,7 @@ func (s *Service) ValueMetric(vars map[string]string) (string, error) {
 }
 
 func (s *Service) GetAllMetrics() string {
-	counter, gouge := s.Storage.GetAllMetrics()
+	counter, gouge := s.Storage.GetMetrics()
 	var b strings.Builder
 
 	b.WriteString("counter")

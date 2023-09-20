@@ -47,7 +47,7 @@ func TestHandler_UpdatePage(t *testing.T) {
 			h := Handler{
 				Logic: tt.fields.Logic,
 			}
-			h.UpdatePage(tt.args.res, tt.args.req)
+			h.UpdateMetric(tt.args.res, tt.args.req)
 		})
 	}
 }

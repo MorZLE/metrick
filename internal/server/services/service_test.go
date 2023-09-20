@@ -78,10 +78,10 @@ func TestService_ProcessingMetrick(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Service{
-				Storage: tt.fields.Storage,
+				Storage: tt.fields.Storage.Repositories,
 			}
-			if err := s.ProcessingMetrick(tt.args.vars); (err != nil) != tt.wantErr {
-				t.Errorf("ProcessingMetrick() error = %v, wantErr %v", err, tt.wantErr)
+			if err := s.ProcessingMetric(tt.args.vars); (err != nil) != tt.wantErr {
+				t.Errorf("ProcessingMetric() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

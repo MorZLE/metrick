@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-// TestService_ProcessingMetric is a test function for the ProcessingMetric method of the Service struct.
-// It tests the behavior of the ProcessingMetric method when given different input variables.
 func TestService_ProcessingMetric(t *testing.T) {
 	type fields struct {
 		Storage storages.MemStorage

@@ -18,7 +18,7 @@ type HandleRequest interface {
 type Handler struct {
 }
 
-func (h Handler) Request(metric string, name string, val string) {
+func (h *Handler) Request(metric string, name string, val string) {
 	var b strings.Builder
 	b.WriteString("http://localhost:8080/update/")
 	b.WriteString(metric)
@@ -38,8 +38,9 @@ func (h Handler) Request(metric string, name string, val string) {
 	req.Header.Add("Content-Type", "text/plain")
 
 	resp, err := client.Do(req)
+	defer resp.Body.Close()
 	if err != nil {
 		panic(err)
 	}
-	defer resp.Body.Close()
+
 }

@@ -24,12 +24,12 @@ type Handler struct {
 	Logic services.ServiceInterface
 }
 
-func (h Handler) UpServer() {
+func (h *Handler) UpServer() {
 	h.routs()
 
 }
 
-func (h Handler) routs() {
+func (h *Handler) routs() {
 	router := mux.NewRouter()
 	router.HandleFunc(`/update/{metric}/{name}/{value}`, h.UpdateMetric)
 	router.HandleFunc(`/update/{metric}/{name}`, h.ValueMetric)
@@ -38,7 +38,7 @@ func (h Handler) routs() {
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func (h Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
+func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	fmt.Println(vars)
 	err := h.Logic.ProcessingMetric(vars)
@@ -55,7 +55,7 @@ func (h Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusOK)
 }
 
-func (h Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
+func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	value, err := h.Logic.ValueMetric(vars)
 
@@ -75,7 +75,7 @@ func (h Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func (h Handler) ValueMetrics(res http.ResponseWriter, _ *http.Request) {
+func (h *Handler) ValueMetrics(res http.ResponseWriter, _ *http.Request) {
 	metrics := h.Logic.GetAllMetrics()
 
 	_, err := res.Write([]byte(metrics))

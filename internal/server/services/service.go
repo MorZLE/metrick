@@ -12,8 +12,8 @@ import (
 var ErrBadRequest = errors.New("BadRequest")
 var ErrStatusNotFound = errors.New("StatusNotFound")
 
-func NewService(s storages.Repositories) Service {
-	return Service{Storage: s}
+func NewService(s *storages.Repositories) Service {
+	return Service{Storage: *s}
 }
 
 type ServiceInterface interface {
@@ -27,7 +27,7 @@ type Service struct {
 	Storage storages.Repositories
 }
 
-func (s Service) ProcessingMetric(vars map[string]string) error {
+func (s *Service) ProcessingMetric(vars map[string]string) error {
 	metric := vars["metric"]
 	name := vars["name"]
 	value := vars["value"]
@@ -56,7 +56,7 @@ func (s Service) ProcessingMetric(vars map[string]string) error {
 
 }
 
-func (s Service) ValueMetric(vars map[string]string) (string, error) {
+func (s *Service) ValueMetric(vars map[string]string) (string, error) {
 	metric := vars["metric"]
 	name := vars["name"]
 
@@ -79,7 +79,7 @@ func (s Service) ValueMetric(vars map[string]string) (string, error) {
 	return "", ErrStatusNotFound
 }
 
-func (s Service) GetAllMetrics() string {
+func (s *Service) GetAllMetrics() string {
 	counter, gouge := s.Storage.GetAllMetrics()
 	var b strings.Builder
 

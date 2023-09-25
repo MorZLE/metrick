@@ -11,6 +11,7 @@ func main() {
 	repo := storages.NewStorage()
 	logic := services.NewService(&repo)
 	h := handlers.NewHandler(&logic)
-	h.UpServer()
+	parseFlags()
+	h.UpServer(flagRunAddr)
 
 }

@@ -8,8 +8,9 @@ import (
 	"time"
 )
 
-func NewService(s storages.MetricInterface, h handlers.HandleRequest) Service {
-	return Service{Metric: s, Handler: h}
+func NewService(s storages.MetricInterface, h handlers.HandleRequest, pollinterval int, reportInterval int, addr string) Service {
+
+	return Service{Metric: s, Handler: h, PollInterval: pollinterval, ReportInterval: reportInterval, Addr: addr}
 }
 
 type ServiceInterface interface {
@@ -18,20 +19,20 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Metric  storages.MetricInterface
-	Handler handlers.HandleRequest
+	Metric         storages.MetricInterface
+	Handler        handlers.HandleRequest
+	PollInterval   int
+	ReportInterval int
+	Addr           string
 }
-
-const pollInterval = 2
-const reportInterval = 10
 
 func (s *Service) UpClient() {
 	for {
 		startTime := time.Now()
 		for {
-			if time.Now().Unix()-startTime.Unix() < reportInterval {
+			if time.Now().Unix()-startTime.Unix() < int64(s.ReportInterval) {
 				s.Metric.UpdateMetric()
-				time.Sleep(pollInterval * time.Second)
+				time.Sleep(time.Duration(s.PollInterval) * time.Second)
 
 			} else {
 				break

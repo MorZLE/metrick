@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
+	parseFlagsAgent()
 	repo := storages.NewStorage()
 	h := handlers.NewHandler()
-	logic := services.NewService(&repo, &h)
-
+	logic := services.NewService(&repo, &h, flagPollInterval, flagReportInterval, flagAddr)
 	logic.UpClient()
 }

@@ -24,18 +24,18 @@ type Handler struct {
 	Logic services.ServiceInterface
 }
 
-func (h *Handler) UpServer() {
-	h.routs()
+func (h *Handler) UpServer(port string) {
+	h.routs(port)
 
 }
 
-func (h *Handler) routs() {
+func (h *Handler) routs(port string) {
 	router := mux.NewRouter()
 	router.HandleFunc(`/update/{metric}/{name}/{value}`, h.UpdateMetric)
 	router.HandleFunc(`/value/{metric}/{name}`, h.ValueMetric)
 	router.HandleFunc(`/`, h.ValueMetrics)
 	http.Handle("/", router)
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(port, router))
 }
 
 func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {

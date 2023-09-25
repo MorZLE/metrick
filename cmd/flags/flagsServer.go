@@ -1,21 +1,25 @@
-package main
+package flags
 
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 )
 
-var flagRunAddr string
+var FlagRunAddr string
 
-func parseFlags() {
+func ParseFlags() {
 
-	flag.StringVar(&flagRunAddr, "a", ":8080", "address and port to run server")
+	flag.StringVar(&FlagRunAddr, "a", "localhost:8080", "address and port to run server")
+
 	flag.Parse()
+
 	if len(flag.Args()) > 0 {
 		// Вывод сообщения об ошибке и синтаксисе использования
 		fmt.Println("Ошибка: неизвестные флаги")
 		flag.Usage()
 		os.Exit(1)
 	}
+	log.Printf("Starting UpServer:%s\n", FlagRunAddr)
 }

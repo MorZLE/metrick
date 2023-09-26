@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func NewHandler() Handler {
-	return Handler{}
+func NewHandler(addr string) Handler {
+	return Handler{port: addr}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest
@@ -17,11 +17,12 @@ type HandleRequest interface {
 }
 
 type Handler struct {
+	port string
 }
 
 func (h *Handler) Request(metric, name, val string) {
-	uri := fmt.Sprintf("http://localhost:8080/update/%s/%s/%s", metric, name, val)
-
+	uri := fmt.Sprintf("http://%s/update/%s/%s/%s", h.port, metric, name, val)
+	log.Println("uri", uri)
 	client := http.Client{Timeout: 3 * time.Second}
 
 	req, err := http.NewRequest(http.MethodPost, uri, nil)

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	config.ParseFlags()
+	config.ParseFlagsServer()
 
 	repo := storages.NewStorage()
 	logic := services.NewService(&repo)

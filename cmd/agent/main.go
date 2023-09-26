@@ -9,10 +9,11 @@ import (
 )
 
 func main() {
-	config.ParseFlagsAgent()
+	cnf := config.NewConfigAgent()
+
 	repo := storages.NewStorage()
-	h := handlers.NewHandler(config.FlagAddr)
-	logic := services.NewService(&repo, &h, config.FlagPollInterval, config.FlagReportInterval)
+	h := handlers.NewHandler()
+	logic := services.NewService(&repo, &h, cnf)
 
 	// Add logging statements
 	log.Println("Starting UpClient...")

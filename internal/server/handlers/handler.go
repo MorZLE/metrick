@@ -12,6 +12,7 @@ func NewHandler(l services.ServiceInterface) Handler {
 	return Handler{Logic: l}
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandlerServer
 type HandlerServer interface {
 	UpServer()
 	routs()

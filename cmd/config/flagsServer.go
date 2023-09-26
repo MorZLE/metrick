@@ -14,11 +14,8 @@ func ParseFlags() {
 
 	flag.Parse()
 
-	if len(flag.Args()) > 0 {
-		// Вывод сообщения об ошибке и синтаксисе использования
-		log.Println("Ошибка: неизвестные флаги")
-		flag.Usage()
-		os.Exit(1)
+	if envRunAddr := os.Getenv("RUN_ADDR"); envRunAddr != "" {
+		FlagRunAddr = envRunAddr
 	}
 	log.Printf("Starting UpServer on %s\n", FlagRunAddr)
 }

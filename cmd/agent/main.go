@@ -11,8 +11,8 @@ import (
 func main() {
 	config.ParseFlagsAgent()
 	repo := storages.NewStorage()
-	h := handlers.NewHandler()
-	logic := services.NewService(&repo, &h, config.FlagPollInterval, config.FlagReportInterval, config.FlagAddr)
+	h := handlers.NewHandler(config.FlagAddr)
+	logic := services.NewService(&repo, &h, config.FlagPollInterval, config.FlagReportInterval)
 
 	// Add logging statements
 	log.Println("Starting UpClient...")

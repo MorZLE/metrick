@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func NewService(s storages.MetricInterface, h handlers.HandleRequest, pollinterval int, reportInterval int, addr string) Service {
+func NewService(s storages.MetricInterface, h handlers.HandleRequest, pollinterval int, reportInterval int) Service {
 
-	return Service{Metric: s, Handler: h, PollInterval: pollinterval, ReportInterval: reportInterval, Addr: addr}
+	return Service{Metric: s, Handler: h, PollInterval: pollinterval, ReportInterval: reportInterval}
 }
 
 type ServiceInterface interface {
@@ -23,7 +23,6 @@ type Service struct {
 	Handler        handlers.HandleRequest
 	PollInterval   int
 	ReportInterval int
-	Addr           string
 }
 
 func (s *Service) UpClient() {

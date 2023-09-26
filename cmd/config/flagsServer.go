@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 )
@@ -17,7 +16,7 @@ func ParseFlags() {
 
 	if len(flag.Args()) > 0 {
 		// Вывод сообщения об ошибке и синтаксисе использования
-		fmt.Println("Ошибка: неизвестные флаги")
+		log.Println("Ошибка: неизвестные флаги")
 		flag.Usage()
 		os.Exit(1)
 	}

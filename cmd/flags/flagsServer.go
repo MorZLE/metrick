@@ -11,7 +11,7 @@ var FlagRunAddr string
 
 func ParseFlags() {
 
-	flag.StringVar(&FlagRunAddr, "a", "localhost:8080", "address and port to run server")
+	flag.StringVar(&FlagRunAddr, "a", ":8080", "address and port to run server")
 
 	flag.Parse()
 
@@ -21,5 +21,5 @@ func ParseFlags() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	log.Printf("Starting UpServer:%s\n", FlagRunAddr)
+	log.Printf("Starting UpServer on %s\n", FlagRunAddr)
 }

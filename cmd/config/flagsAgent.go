@@ -1,9 +1,7 @@
-package flags
+package config
 
 import (
 	"flag"
-	"fmt"
-	"os"
 )
 
 var FlagAddr string
@@ -16,10 +14,10 @@ func ParseFlagsAgent() {
 	flag.IntVar(&FlagReportInterval, "r", 10, "Metric report interval")
 	flag.IntVar(&FlagPollInterval, "p", 2, "Metric collection time")
 	flag.Parse()
-	if len(flag.Args()) > 0 {
-		// Вывод сообщения об ошибке и синтаксисе использования
-		fmt.Println("Ошибка: неизвестные флаги")
-		flag.Usage()
-		os.Exit(1)
-	}
+	//if len(flag.Args()) > 0 {
+	//	// Вывод сообщения об ошибке и синтаксисе использования
+	//	log.Println("Ошибка: неизвестные флаги")
+	//	flag.Usage()
+	//	os.Exit(1)
+	//}
 }

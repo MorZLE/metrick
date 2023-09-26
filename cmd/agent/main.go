@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/MorZLE/metrick/cmd/flags"
+	"github.com/MorZLE/metrick/cmd/config"
 	"github.com/MorZLE/metrick/internal/client/handlers"
 	"github.com/MorZLE/metrick/internal/client/services"
 	"github.com/MorZLE/metrick/internal/client/storages"
@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	flags.ParseFlagsAgent()
+	config.ParseFlagsAgent()
 	repo := storages.NewStorage()
 	h := handlers.NewHandler()
-	logic := services.NewService(&repo, &h, flags.FlagPollInterval, flags.FlagReportInterval, flags.FlagAddr)
+	logic := services.NewService(&repo, &h, config.FlagPollInterval, config.FlagReportInterval, config.FlagAddr)
 
 	// Add logging statements
 	log.Println("Starting UpClient...")

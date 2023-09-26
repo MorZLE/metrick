@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"github.com/MorZLE/metrick/internal/server/services"
 	"github.com/gorilla/mux"
 	"log"
@@ -35,12 +34,11 @@ func (h *Handler) routs(port string) {
 	router.HandleFunc(`/value/{metric}/{name}`, h.ValueMetric)
 	router.HandleFunc(`/`, h.ValueMetrics)
 	http.Handle("/", router)
-	log.Fatal(http.ListenAndServe(port, router))
+	log.Println(http.ListenAndServe(port, router))
 }
 
 func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	fmt.Println(vars)
 	err := h.Logic.ProcessingMetric(vars)
 	if err != nil {
 		if errors.Is(err, services.ErrBadRequest) {

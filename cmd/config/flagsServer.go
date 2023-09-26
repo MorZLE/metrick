@@ -14,7 +14,7 @@ func ParseFlags() {
 
 	flag.Parse()
 
-	if envRunAddr := os.Getenv("RUN_ADDR"); envRunAddr != "" {
+	if envRunAddr := os.Getenv("ADDRESS"); envRunAddr != "" {
 		FlagRunAddr = envRunAddr
 	}
 	log.Printf("Starting UpServer on %s\n", FlagRunAddr)

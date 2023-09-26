@@ -18,11 +18,11 @@ func ParseFlagsAgent() {
 	flag.IntVar(&FlagPollInterval, "p", 2, "Metric collection time")
 	flag.Parse()
 
-	if envRunAddr := os.Getenv("RUN_ADDR"); envRunAddr != "" {
+	if envRunAddr := os.Getenv("ADDRESS"); envRunAddr != "" {
 		FlagAddr = envRunAddr
 	}
 
-	if ReportInterval := os.Getenv("ReportInterval"); ReportInterval != "" {
+	if ReportInterval := os.Getenv("REPORT_INTERVAL "); ReportInterval != "" {
 		ReportInterval, err := strconv.Atoi(ReportInterval)
 		if err != nil {
 			fmt.Println("Ошибка преобразования строки в число:", err)
@@ -31,7 +31,7 @@ func ParseFlagsAgent() {
 		FlagReportInterval = ReportInterval
 	}
 
-	if PollInterval := os.Getenv("PollInterval"); PollInterval != "" {
+	if PollInterval := os.Getenv("POLL_INTERVAL "); PollInterval != "" {
 		PollInterval, err := strconv.Atoi(PollInterval)
 		if err != nil {
 			fmt.Println("Ошибка преобразования строки в число:", err)

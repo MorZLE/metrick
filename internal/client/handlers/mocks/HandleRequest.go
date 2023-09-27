@@ -9,9 +9,9 @@ type HandleRequest struct {
 	mock.Mock
 }
 
-// Request provides a mock function with given fields: metric, name, val, port
-func (_m *HandleRequest) Request(metric string, name string, val string, port string) {
-	_m.Called(metric, name, val, port)
+// Request provides a mock function with given fields: metric, name, val
+func (_m *HandleRequest) Request(metric string, name string, val string) {
+	_m.Called(metric, name, val)
 }
 
 type mockConstructorTestingTNewHandleRequest interface {

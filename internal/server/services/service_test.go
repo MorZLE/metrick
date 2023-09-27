@@ -2,8 +2,8 @@ package services
 
 import (
 	"errors"
+	"github.com/MorZLE/metrick/internal/server/mocks"
 	"github.com/MorZLE/metrick/internal/server/storages"
-	"github.com/MorZLE/metrick/internal/server/storages/mocks"
 	"testing"
 )
 

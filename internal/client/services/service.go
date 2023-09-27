@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"github.com/MorZLE/metrick/cmd/config"
+	"github.com/MorZLE/metrick/config"
 	"github.com/MorZLE/metrick/internal/client/handlers"
 	"github.com/MorZLE/metrick/internal/client/storages"
 	"strconv"

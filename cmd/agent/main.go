@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/MorZLE/metrick/cmd/config"
+	"github.com/MorZLE/metrick/config"
 	"github.com/MorZLE/metrick/internal/client/handlers"
 	"github.com/MorZLE/metrick/internal/client/services"
 	"github.com/MorZLE/metrick/internal/client/storages"

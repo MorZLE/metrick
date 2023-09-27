@@ -4,23 +4,16 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"net/http"
-)
-
-package logger
-
-import (
-"net/http"
-
-"go.uber.org/zap"
+	"strconv"
+	"time"
 )
 
 // Log будет доступен всему коду как синглтон.
-// Никакой код навыка, кроме функции InitLogger, не должен модифицировать эту переменную.
-// По умолчанию установлен no-op-логер, который не выводит никаких сообщений.
+
 var Log *zap.Logger = zap.NewNop()
 
 // Initialize инициализирует синглтон логера с необходимым уровнем логирования.
-func Initialize()  {
+func Initialize() {
 	// преобразуем текстовый уровень логирования в zap.AtomicLevel
 	lvl, err := zap.ParseAtomicLevel("info")
 	if err != nil {
@@ -37,16 +30,50 @@ func Initialize()  {
 	}
 	// устанавливаем синглтон
 	Log = zl
-	return nil
+}
+
+type LoggingResponseWriter struct {
+	http.ResponseWriter
+	Status int
+	Size   int
+}
+
+func (w *LoggingResponseWriter) WriteHeader(status int) {
+	w.Status = status
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *LoggingResponseWriter) Write(b []byte) (int, error) {
+	size, err := w.ResponseWriter.Write(b)
+	w.Size += size
+	return size, err
 }
 
 // RequestLogger — middleware-логер для входящих HTTP-запросов.
 func RequestLogger(h http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		Log.Debug("got incoming HTTP request",
+
+		loggingResponseWriter := &LoggingResponseWriter{
+			ResponseWriter: w,
+			Status:         http.StatusOK,
+		}
+
+		start := time.Now()
+		h.ServeHTTP(loggingResponseWriter, r)
+
+		duration := time.Since(start)
+
+		Log.Info("Request",
 			zap.String("method", r.Method),
-			zap.String("path", r.URL.Path),
+			zap.String("uri", r.RequestURI),
+			zap.String("duration", strconv.FormatInt(int64(duration), 10)),
 		)
-		h(w, r)
+		Log.Info("Response",
+			zap.Int("status", loggingResponseWriter.Status),
+			zap.String("method", r.Method),
+			zap.Int("content_size", loggingResponseWriter.Size),
+		)
+		return
+
 	})
 }

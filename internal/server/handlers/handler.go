@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"net/http"
-	"time"
 )
 
 func NewHandler(l services.ServiceInterface, cnf *config.ConfigServer) Handler {
@@ -33,10 +32,9 @@ func (h *Handler) UpServer() {
 	logger.Initialize()
 
 	router := mux.NewRouter()
-	router.HandleFunc(`/update/{metric}/{name}/{value}`, logger.RequestLogger(h.UpdateMetric))
-	router.HandleFunc(`/value/{metric}/{name}`, h.ValueMetric)
-	router.HandleFunc(`/`, h.ValueMetrics)
-	http.Handle("/", router)
+	router.Handle(`/update/{metric}/{name}/{value}`, logger.RequestLogger(h.UpdateMetric))
+	router.Handle(`/value/{metric}/{name}`, logger.RequestLogger(h.ValueMetric))
+	router.Handle(`/`, logger.RequestLogger(h.ValueMetrics))
 
 	logger.Log.Info("Running server", zap.String("address", h.cnf.FlagRunAddr))
 	log.Println(http.ListenAndServe(h.cnf.FlagRunAddr, router))
@@ -89,38 +87,4 @@ func (h *Handler) ValueMetrics(res http.ResponseWriter, _ *http.Request) {
 
 	res.WriteHeader(http.StatusOK)
 
-}
-
-var sugar zap.SugaredLogger
-
-// WithLogging добавляет дополнительный код для регистрации сведений о запросе
-// и возвращает новый http.Handler.
-func WithLogging(h http.Handler) http.Handler {
-	logFn := func(w http.ResponseWriter, r *http.Request) {
-		// функция Now() возвращает текущее время
-		start := time.Now()
-
-		// эндпоинт /ping
-		uri := r.RequestURI
-		// метод запроса
-		method := r.Method
-
-		// точка, где выполняется хендлер pingHandler
-		h.ServeHTTP(w, r) // обслуживание оригинального запроса
-
-		// Since возвращает разницу во времени между start
-		// и моментом вызова Since. Таким образом можно посчитать
-		// время выполнения запроса.
-		duration := time.Since(start)
-
-		// отправляем сведения о запросе в zap
-		sugar.Infoln(
-			"uri", uri,
-			"method", method,
-			"duration", duration,
-		)
-
-	}
-	// возвращаем функционально расширенный хендлер
-	return http.HandlerFunc(logFn)
 }

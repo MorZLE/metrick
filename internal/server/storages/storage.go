@@ -11,6 +11,7 @@ func NewStorage() MemStorage {
 	return MemStorage{mCounter: mC, mGouge: mG}
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=Repositories
 type Repositories interface {
 	AddCounter(v server.Counter)
 	AddGauge(v server.Gauge)

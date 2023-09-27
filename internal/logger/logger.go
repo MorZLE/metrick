@@ -73,7 +73,5 @@ func RequestLogger(h http.HandlerFunc) http.Handler {
 			zap.String("method", r.Method),
 			zap.Int("content_size", loggingResponseWriter.Size),
 		)
-		return
-
 	})
 }

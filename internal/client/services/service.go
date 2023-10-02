@@ -11,7 +11,7 @@ import (
 
 func NewService(s storages.MetricInterface, h handlers.HandleRequest, cnf *config.ConfigAgent) Service {
 
-	return Service{Metric: s, Handler: h, cnf: cnf}
+	return Service{metric: s, handler: h, cnf: cnf}
 }
 
 type ServiceInterface interface {
@@ -20,8 +20,8 @@ type ServiceInterface interface {
 }
 
 type Service struct {
-	Metric  storages.MetricInterface
-	Handler handlers.HandleRequest
+	metric  storages.MetricInterface
+	handler handlers.HandleRequest
 	cnf     *config.ConfigAgent
 }
 
@@ -30,7 +30,7 @@ func (s *Service) UpClient() {
 		startTime := time.Now()
 		for {
 			if time.Now().Unix()-startTime.Unix() < int64(s.cnf.FlagReportInterval) {
-				s.Metric.UpdateMetric()
+				s.metric.UpdateMetric()
 				time.Sleep(time.Duration(s.cnf.FlagPollInterval) * time.Second)
 
 			} else {
@@ -42,13 +42,13 @@ func (s *Service) UpClient() {
 }
 
 func (s *Service) SendRequest() {
-	mGouge := s.Metric.GetMGauge()
+	mGouge := s.metric.GetMGauge()
 	for k, v := range mGouge {
-		s.Handler.Request("gauge", k, fmt.Sprint(v), s.cnf.FlagAddr)
+		s.handler.Request("gauge", k, fmt.Sprint(v), s.cnf.FlagAddr)
 	}
-	mCounter := s.Metric.GetMCounter()
+	mCounter := s.metric.GetMCounter()
 	for k, v := range mCounter {
-		s.Handler.Request("counter", k, strconv.Itoa(v), s.cnf.FlagAddr)
+		s.handler.Request("counter", k, strconv.Itoa(v), s.cnf.FlagAddr)
 	}
 
 }

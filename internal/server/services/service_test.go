@@ -1,7 +1,7 @@
 package services
 
 import (
-	"errors"
+	"github.com/MorZLE/metrick/internal/constants"
 	"github.com/MorZLE/metrick/internal/server/mocks"
 	"github.com/MorZLE/metrick/internal/server/storages"
 	"testing"
@@ -80,9 +80,9 @@ func TestService_ProcessingMetric(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Service{
-				Storage: &tt.fields.Storage,
+				storage: &tt.fields.Storage,
 			}
-			if err := s.ProcessingMetric(tt.args.vars); (err != nil) != tt.wantErr {
+			if err := s.ProcessingMetric(tt.args.vars["metric"], tt.args.vars["name"], tt.args.vars["value"]); (err != nil) != tt.wantErr {
 				t.Errorf("ProcessingMetrick() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -91,8 +91,11 @@ func TestService_ProcessingMetric(t *testing.T) {
 
 func TestService_ValueMetric(t *testing.T) {
 
+	type mckS func(r *mocks.Repositories)
+
 	type args struct {
-		vars map[string]string
+		vars        map[string]string
+		mockStorage mckS
 	}
 	tests := []struct {
 		name    string
@@ -106,68 +109,69 @@ func TestService_ValueMetric(t *testing.T) {
 				vars: map[string]string{
 					"metric": "counter",
 					"name":   "test1",
-				}},
+				},
+				mockStorage: func(r *mocks.Repositories) {
+					r.On("GetCounter", "test1").Return(23, nil).Once()
+				},
+			},
+
 			want:    "23",
 			wantErr: false,
 		},
 
 		{
-			name: "PositiveTest1",
+			name: "PositiveTest2",
 			args: args{
 				vars: map[string]string{
 					"metric": "gauge",
 					"name":   "test2",
-				}},
+				},
+				mockStorage: func(r *mocks.Repositories) {
+					r.On("GetGauge", "test2").Return(23.3, nil).Once()
+				},
+			},
 			want:    "23.3",
 			wantErr: false,
 		},
 		{
-			name: "FailTest1",
+			name: "FailTestGetCounter",
 			args: args{
 				vars: map[string]string{
 					"metric": "counter",
 					"name":   "test3",
-				}},
+				},
+				mockStorage: func(r *mocks.Repositories) {
+					r.On("GetCounter", "test3").Return(0, constants.ErrStatusNotFound).Once()
+				},
+			},
 			wantErr: true,
 		},
 
 		{
-			name: "FailTest2",
+			name: "FailTestGetGauge",
 			args: args{
 				vars: map[string]string{
 					"metric": "gauge",
 					"name":   "test4",
-				}},
+				},
+				mockStorage: func(r *mocks.Repositories) {
+					r.On("GetGauge", "test4").Return(0.0, constants.ErrStatusNotFound).Once()
+				},
+			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			storage := mocks.NewRepositories(t)
-			switch tt.args.vars["metric"] {
-			case "counter":
-
-				if tt.wantErr {
-					storage.On("GetCounter", tt.args.vars["name"]).Return(0, errors.New("not found")).Once()
-				} else {
-					storage.On("GetCounter", tt.args.vars["name"]).Return(23, nil).Once()
-				}
-			case "gauge":
-
-				if tt.wantErr {
-
-					storage.On("GetGauge", tt.args.vars["name"]).Return(0.0, errors.New("not found")).Once()
-				} else {
-					storage.On("GetGauge", tt.args.vars["name"]).Return(23.3, nil).Once()
-				}
-
-			}
+			tt.args.mockStorage(storage)
 
 			s := &Service{
-				Storage: storage,
+				storage: storage,
 			}
 
-			got, err := s.ValueMetric(tt.args.vars)
+			got, err := s.ValueMetric(tt.args.vars["metric"], tt.args.vars["name"])
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValueMetric() error = %v, wantErr %v", err, tt.wantErr)
 				return

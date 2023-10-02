@@ -12,7 +12,7 @@ func main() {
 	cnf := config.NewConfigAgent()
 
 	repo := storages.NewStorage()
-	h := handlers.NewHandler()
+	h := handlers.NewSender()
 	logic := services.NewService(&repo, &h, cnf)
 
 	// Add logging statements

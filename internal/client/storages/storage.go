@@ -1,7 +1,6 @@
 package storages
 
 import (
-	"github.com/MorZLE/metrick/internal/server"
 	"math/rand"
 	"runtime"
 )
@@ -9,7 +8,7 @@ import (
 var memStats runtime.MemStats
 
 func NewStorage() Metric {
-	return Metric{MGauge: make(map[string]any), MCounter: make(map[string]int)}
+	return Metric{mGauge: make(map[string]any), mCounter: make(map[string]int)}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=MetricInterface
@@ -20,50 +19,49 @@ type MetricInterface interface {
 }
 
 type Metric struct {
-	PollCount server.Counter
-	MGauge    map[string]any
-	MCounter  map[string]int
+	mGauge   map[string]any
+	mCounter map[string]int
 }
 
 func (m *Metric) UpdateMetric() *Metric {
-	m.MCounter["PollCount"]++
+	m.mCounter["PollCount"]++
 
-	m.MGauge["Alloc"] = memStats.Alloc
-	m.MGauge["BuckHashSys"] = memStats.BuckHashSys
-	m.MGauge["Frees"] = memStats.Frees
-	m.MGauge["GCCPUFraction"] = memStats.GCCPUFraction
-	m.MGauge["GCSys"] = memStats.GCSys
-	m.MGauge["HeapAlloc"] = memStats.HeapAlloc
-	m.MGauge["HeapIdle"] = memStats.HeapIdle
-	m.MGauge["HeapInuse"] = memStats.HeapInuse
-	m.MGauge["HeapObjects"] = memStats.HeapObjects
-	m.MGauge["HeapReleased"] = memStats.HeapReleased
-	m.MGauge["HeapSys"] = memStats.HeapSys
-	m.MGauge["LastGC"] = memStats.LastGC
-	m.MGauge["Lookups"] = memStats.Lookups
-	m.MGauge["MCacheInuse"] = memStats.MCacheInuse
-	m.MGauge["MCacheSys"] = memStats.MCacheSys
-	m.MGauge["MSpanInuse"] = memStats.MSpanInuse
-	m.MGauge["MSpanSys"] = memStats.MSpanSys
-	m.MGauge["Mallocs"] = memStats.Mallocs
-	m.MGauge["NextGC"] = memStats.NextGC
-	m.MGauge["NumForcedGC"] = memStats.NumForcedGC
-	m.MGauge["NumGC"] = memStats.NumGC
-	m.MGauge["OtherSys"] = memStats.OtherSys
-	m.MGauge["PauseTotalNs"] = memStats.PauseTotalNs
-	m.MGauge["StackInuse"] = memStats.StackInuse
-	m.MGauge["StackSys"] = memStats.StackSys
-	m.MGauge["Sys"] = memStats.Sys
-	m.MGauge["TotalAlloc"] = memStats.TotalAlloc
-	m.MGauge["RandomValue"] = rand.Float64()
+	m.mGauge["Alloc"] = memStats.Alloc
+	m.mGauge["BuckHashSys"] = memStats.BuckHashSys
+	m.mGauge["Frees"] = memStats.Frees
+	m.mGauge["GCCPUFraction"] = memStats.GCCPUFraction
+	m.mGauge["GCSys"] = memStats.GCSys
+	m.mGauge["HeapAlloc"] = memStats.HeapAlloc
+	m.mGauge["HeapIdle"] = memStats.HeapIdle
+	m.mGauge["HeapInuse"] = memStats.HeapInuse
+	m.mGauge["HeapObjects"] = memStats.HeapObjects
+	m.mGauge["HeapReleased"] = memStats.HeapReleased
+	m.mGauge["HeapSys"] = memStats.HeapSys
+	m.mGauge["LastGC"] = memStats.LastGC
+	m.mGauge["Lookups"] = memStats.Lookups
+	m.mGauge["MCacheInuse"] = memStats.MCacheInuse
+	m.mGauge["MCacheSys"] = memStats.MCacheSys
+	m.mGauge["MSpanInuse"] = memStats.MSpanInuse
+	m.mGauge["MSpanSys"] = memStats.MSpanSys
+	m.mGauge["Mallocs"] = memStats.Mallocs
+	m.mGauge["NextGC"] = memStats.NextGC
+	m.mGauge["NumForcedGC"] = memStats.NumForcedGC
+	m.mGauge["NumGC"] = memStats.NumGC
+	m.mGauge["OtherSys"] = memStats.OtherSys
+	m.mGauge["PauseTotalNs"] = memStats.PauseTotalNs
+	m.mGauge["StackInuse"] = memStats.StackInuse
+	m.mGauge["StackSys"] = memStats.StackSys
+	m.mGauge["Sys"] = memStats.Sys
+	m.mGauge["TotalAlloc"] = memStats.TotalAlloc
+	m.mGauge["RandomValue"] = rand.Float64()
 
 	return m
 }
 
 func (m *Metric) GetMGauge() map[string]any {
-	return m.MGauge
+	return m.mGauge
 }
 
 func (m Metric) GetMCounter() map[string]int {
-	return m.MCounter
+	return m.mCounter
 }

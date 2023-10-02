@@ -21,8 +21,8 @@ type ConfigAgent struct {
 func ParseFlagsAgent(p *ConfigAgent) *ConfigAgent {
 
 	flag.StringVar(&p.FlagAddr, "a", ":8080", "address and port to run server")
-	flag.IntVar(&p.FlagReportInterval, "r", 10, "Metric report interval")
-	flag.IntVar(&p.FlagPollInterval, "p", 2, "Metric collection time")
+	flag.IntVar(&p.FlagReportInterval, "r", 10, "metric report interval")
+	flag.IntVar(&p.FlagPollInterval, "p", 2, "metric collection time")
 	flag.Parse()
 
 	if envRunAddr := os.Getenv("ADDRESS"); envRunAddr != "" {

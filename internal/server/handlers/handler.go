@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"github.com/MorZLE/metrick/config"
+	"github.com/MorZLE/metrick/internal/constants"
 	"github.com/MorZLE/metrick/internal/logger"
 	"github.com/MorZLE/metrick/internal/server/services"
 	"github.com/gorilla/mux"
@@ -12,7 +13,7 @@ import (
 )
 
 func NewHandler(l services.ServiceInterface, cnf *config.ConfigServer) Handler {
-	return Handler{Logic: l, cnf: cnf}
+	return Handler{logic: l, cnf: cnf}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandlerServer
@@ -23,8 +24,7 @@ type HandlerServer interface {
 }
 
 type Handler struct {
-	HandlerServer
-	Logic services.ServiceInterface
+	logic services.ServiceInterface
 	cnf   *config.ConfigServer
 }
 
@@ -43,26 +43,32 @@ func (h *Handler) UpServer() {
 
 func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	err := h.Logic.ProcessingMetric(vars)
+	metric := vars["metric"]
+	name := vars["name"]
+	value := vars["value"]
+
+	err := h.logic.ProcessingMetric(metric, name, value)
 	if err != nil {
-		if errors.Is(err, services.ErrBadRequest) {
+		if errors.Is(err, constants.ErrBadRequest) {
 			http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 
 		}
-		if errors.Is(err, services.ErrStatusNotFound) {
+		if errors.Is(err, constants.ErrStatusNotFound) {
 			http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
-		return
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 	res.WriteHeader(http.StatusOK)
 }
 
 func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	value, err := h.Logic.ValueMetric(vars)
+	metric := vars["metric"]
+	name := vars["name"]
+	value, err := h.logic.ValueMetric(metric, name)
 
 	if err != nil {
-		if errors.Is(err, services.ErrStatusNotFound) {
+		if errors.Is(err, constants.ErrStatusNotFound) {
 			http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 		return
@@ -78,7 +84,7 @@ func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) ValueMetrics(res http.ResponseWriter, _ *http.Request) {
-	metrics := h.Logic.GetAllMetrics()
+	metrics := h.logic.GetAllMetrics()
 
 	_, err := res.Write([]byte(metrics))
 	if err != nil {

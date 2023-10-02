@@ -1,7 +1,7 @@
 package storages
 
 import (
-	"errors"
+	"github.com/MorZLE/metrick/internal/constants"
 	"github.com/MorZLE/metrick/internal/server"
 )
 
@@ -22,7 +22,6 @@ type Repositories interface {
 }
 
 type MemStorage struct {
-	Repositories
 	mCounter map[string]int
 	mGouge   map[string]float64
 }
@@ -40,14 +39,14 @@ func (s *MemStorage) GetCounter(name string) (int, error) {
 	if v, err := s.mCounter[name]; err {
 		return v, nil
 	}
-	return 0, errors.New("not found")
+	return 0, constants.ErrStatusNotFound
 }
 
 func (s *MemStorage) GetGauge(name string) (float64, error) {
 	if v, err := s.mGouge[name]; err {
 		return v, nil
 	}
-	return 0.0, errors.New("not found")
+	return 0.0, constants.ErrStatusNotFound
 }
 
 func (s *MemStorage) GetMetrics() (map[string]int, map[string]float64) {

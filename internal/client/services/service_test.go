@@ -2,11 +2,16 @@ package services
 
 import (
 	"github.com/MorZLE/metrick/config"
+	"github.com/MorZLE/metrick/internal/client/constants"
 	"github.com/MorZLE/metrick/internal/client/mocks"
 	"testing"
 )
 
 func TestService_SendRequest(t *testing.T) {
+	var t1 float64 = 23.3
+	var t11 int64 = 23
+	var t2 float64 = 234.34234
+	var t22 int64 = 2346436436
 
 	type mckS func(r *mocks.MetricInterface)
 	type mckH func(r *mocks.HandleRequest)
@@ -14,6 +19,33 @@ func TestService_SendRequest(t *testing.T) {
 	type args struct {
 		mockHandler mckH
 		mockStorage mckS
+	}
+
+	obj := map[string]constants.Metrics{
+		"test1": constants.Metrics{
+			ID:    "wer",
+			MType: "gauge",
+			Delta: nil,
+			Value: &t1,
+		},
+		"test1.1": constants.Metrics{
+			ID:    "erg",
+			MType: "counter",
+			Delta: &t11,
+			Value: nil,
+		},
+		"test2": constants.Metrics{
+			ID:    "sdfwefvdv",
+			MType: "gauge",
+			Delta: nil,
+			Value: &t2,
+		},
+		"test2.1": constants.Metrics{
+			ID:    "segfrdbhtfhtrh",
+			MType: "counter",
+			Delta: &t22,
+			Value: nil,
+		},
 	}
 
 	tests := []struct {
@@ -32,8 +64,8 @@ func TestService_SendRequest(t *testing.T) {
 					}).Once()
 				},
 				mockHandler: func(r *mocks.HandleRequest) {
-					r.On("Request", "gauge", "wer", "23.3", ":8080").Return().Once()
-					r.On("Request", "counter", "erg", "23", ":8080").Return().Once()
+					r.On("Request", obj["test1"], ":8080").Return().Once()
+					r.On("Request", obj["test1.1"], ":8080").Return().Once()
 				},
 			},
 		},
@@ -49,8 +81,8 @@ func TestService_SendRequest(t *testing.T) {
 					}).Once()
 				},
 				mockHandler: func(r *mocks.HandleRequest) {
-					r.On("Request", "gauge", "sdfwefvdv", "234.34234", ":8080").Return().Once()
-					r.On("Request", "counter", "segfrdbhtfhtrh", "2346436436", ":8080").Return().Once()
+					r.On("Request", obj["test2"], ":8080").Return().Once()
+					r.On("Request", obj["test2.1"], ":8080").Return().Once()
 				},
 			},
 		},
@@ -62,6 +94,7 @@ func TestService_SendRequest(t *testing.T) {
 			storage := mocks.NewMetricInterface(t)
 
 			tt.args.mockStorage(storage)
+			tt.args.mockHandler(client)
 
 			s := &Service{
 				handler: client,
@@ -70,8 +103,6 @@ func TestService_SendRequest(t *testing.T) {
 					FlagAddr: ":8080",
 				},
 			}
-
-			tt.args.mockHandler(client)
 
 			s.SendRequest()
 		})

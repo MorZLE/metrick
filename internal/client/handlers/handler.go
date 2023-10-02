@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/MorZLE/metrick/internal/client/constants"
 	"log"
 	"net/http"
 	"time"
@@ -13,22 +16,25 @@ func NewSender() Handler {
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest
 type HandleRequest interface {
-	Request(metric string, name string, val string, port string)
+	Request(obj constants.Metrics, port string)
 }
 
 type Handler struct {
 	client http.Client
 }
 
-func (h *Handler) Request(metric, name, val, port string) {
-	uri := fmt.Sprintf("http://%s/update/%s/%s/%s", port, metric, name, val)
+func (h *Handler) Request(obj constants.Metrics, port string) {
+	uri := fmt.Sprintf("http://%s/update/", port)
 	log.Println("uri", uri)
-
-	req, err := http.NewRequest(http.MethodPost, uri, nil)
+	body, err := json.Marshal(obj)
 	if err != nil {
 		log.Println(err)
 	}
-	req.Header.Set("Content-Type", "text/plain")
+	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(body))
+	if err != nil {
+		log.Println(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := h.client.Do(req)
 	if err != nil {

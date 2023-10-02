@@ -18,6 +18,7 @@ type ServiceInterface interface {
 	ProcessingMetric(metric, name, val string) error
 	ValueMetric(metric, name string) (string, error)
 	GetAllMetrics() string
+	ValueMetricJSON(metric string, name string) (interface{}, interface{})
 }
 
 type Service struct {
@@ -96,4 +97,35 @@ func (s *Service) GetAllMetrics() string {
 	metrics := b.String()
 	return metrics
 
+}
+
+func (s *Service) ValueMetricJSON(metric, name string) (constants.Metrics, error) {
+	val, err := s.ValueMetric(metric, name)
+	if errors.Is(err, constants.ErrStatusNotFound) {
+		return constants.Metrics{}, constants.ErrStatusNotFound
+
+	}
+	if metric == "counter" {
+		num, err := strconv.ParseInt(val, 10, 64)
+		if err != nil {
+			return constants.Metrics{}, constants.ErrParseInt
+		}
+		return constants.Metrics{
+			ID:    name,
+			MType: "counter",
+			Delta: &num,
+		}, nil
+	}
+	if metric == "gauge" {
+		num, err := strconv.ParseFloat(val, 64)
+		if err != nil {
+			return constants.Metrics{}, constants.ErrParseFloat
+		}
+		return constants.Metrics{
+			ID:    name,
+			MType: "gauge",
+			Value: &num,
+		}, nil
+	}
+	return constants.Metrics{}, constants.ErrStatusNotFound
 }

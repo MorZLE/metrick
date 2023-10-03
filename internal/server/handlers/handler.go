@@ -148,17 +148,18 @@ func (h *Handler) ValueMetricJSON(res http.ResponseWriter, req *http.Request) {
 	// читаем тело запроса
 	_, err := buf.ReadFrom(req.Body)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	if err = json.Unmarshal(buf.Bytes(), &metricJSON); err != nil {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	metric := metricJSON.ID
 	name := metricJSON.MType
+
 	h.ResponseValueJSON(res, metric, name)
 
 }
@@ -166,16 +167,17 @@ func (h *Handler) ValueMetricJSON(res http.ResponseWriter, req *http.Request) {
 func (h *Handler) ResponseValueJSON(res http.ResponseWriter, metric, name string) {
 
 	obj, err := h.logic.ValueMetricJSON(metric, name)
-	if err != nil {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	if errors.Is(err, constants.ErrStatusNotFound) {
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	resp, err := json.Marshal(obj)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Accept", "application/json")
 	res.WriteHeader(http.StatusOK)
 	res.Write(resp)
 

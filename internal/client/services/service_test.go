@@ -8,9 +8,10 @@ import (
 )
 
 func TestService_SendRequest(t *testing.T) {
-	var t1 float64 = 23.3
+	var t1 = 23.3
+	var t2 = 234.34234
+
 	var t11 int64 = 23
-	var t2 float64 = 234.34234
 	var t22 int64 = 2346436436
 
 	type mckS func(r *mocks.MetricInterface)

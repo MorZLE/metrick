@@ -8,8 +8,8 @@ import (
 )
 
 func TestService_SendRequest(t *testing.T) {
-	var t1 = 23.3
-	var t2 = 234.34234
+	t1 := 23.3
+	t2 := 234.34234
 
 	var t11 int64 = 23
 	var t22 int64 = 2346436436
@@ -22,26 +22,28 @@ func TestService_SendRequest(t *testing.T) {
 		mockStorage mckS
 	}
 
-	obj := map[string]constants.Metrics{
-		"test1": constants.Metrics{
+	type metArgs constants.Metrics
+
+	obj := map[string]metArgs{
+		"test1": {
 			ID:    "wer",
 			MType: "gauge",
 			Delta: nil,
 			Value: &t1,
 		},
-		"test1.1": constants.Metrics{
+		"test1.1": {
 			ID:    "erg",
 			MType: "counter",
 			Delta: &t11,
 			Value: nil,
 		},
-		"test2": constants.Metrics{
+		"test2": {
 			ID:    "sdfwefvdv",
 			MType: "gauge",
 			Delta: nil,
 			Value: &t2,
 		},
-		"test2.1": constants.Metrics{
+		"test2.1": {
 			ID:    "segfrdbhtfhtrh",
 			MType: "counter",
 			Delta: &t22,

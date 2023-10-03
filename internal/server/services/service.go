@@ -18,7 +18,7 @@ type ServiceInterface interface {
 	ProcessingMetric(metric, name, val string) error
 	ValueMetric(metric, name string) (string, error)
 	GetAllMetrics() string
-	ValueMetricJSON(metric string, name string) (interface{}, interface{})
+	ValueMetricJSON(metric string, name string) (constants.Metrics, error)
 }
 
 type Service struct {

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MorZLE/metrick/internal/client/constants"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -42,11 +41,6 @@ func (h *Handler) Request(obj constants.Metrics, port string) {
 	if err != nil {
 		log.Println(err)
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(resp.Body)
+	defer resp.Body.Close()
 
 }

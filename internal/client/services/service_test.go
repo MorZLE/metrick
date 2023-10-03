@@ -22,9 +22,7 @@ func TestService_SendRequest(t *testing.T) {
 		mockStorage mckS
 	}
 
-	type metArgs constants.Metrics
-
-	obj := map[string]metArgs{
+	obj := map[string]constants.Metrics{
 		"test1": {
 			ID:    "wer",
 			MType: "gauge",
@@ -59,7 +57,7 @@ func TestService_SendRequest(t *testing.T) {
 			name: "goodTest1",
 			args: args{
 				mockStorage: func(r *mocks.MetricInterface) {
-					r.On("GetMGauge").Return(map[string]interface{}{
+					r.On("GetMGauge").Return(map[string]any{
 						"wer": 23.3,
 					}).Once()
 					r.On("GetMCounter").Return(map[string]int{
@@ -76,7 +74,7 @@ func TestService_SendRequest(t *testing.T) {
 			name: "goodTest2",
 			args: args{
 				mockStorage: func(r *mocks.MetricInterface) {
-					r.On("GetMGauge").Return(map[string]interface{}{
+					r.On("GetMGauge").Return(map[string]any{
 						"sdfwefvdv": 234.34234,
 					}).Once()
 					r.On("GetMCounter").Return(map[string]int{

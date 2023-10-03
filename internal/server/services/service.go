@@ -115,6 +115,7 @@ func (s *Service) ValueMetricJSON(metric, name string) (constants.Metrics, error
 			MType: "counter",
 			Delta: &num,
 		}, nil
+
 	case "gauge":
 		num, err := strconv.ParseFloat(val, 64)
 		if err != nil {
@@ -125,6 +126,7 @@ func (s *Service) ValueMetricJSON(metric, name string) (constants.Metrics, error
 			MType: "gauge",
 			Value: &num,
 		}, nil
+
 	default:
 		return constants.Metrics{}, constants.ErrStatusNotFound
 	}

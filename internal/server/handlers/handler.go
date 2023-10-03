@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/MorZLE/metrick/config"
 	"github.com/MorZLE/metrick/internal/constants"
 	"github.com/MorZLE/metrick/internal/logger"
@@ -123,7 +124,7 @@ func (h *Handler) UpdateMetricJSON(res http.ResponseWriter, req *http.Request) {
 	default:
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
-
+	fmt.Println(value)
 	err = h.logic.ProcessingMetric(metric, name, value)
 
 	if err != nil {

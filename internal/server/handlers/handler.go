@@ -23,7 +23,15 @@ func NewHandler(l services.ServiceInterface, cnf *config.ConfigServer) Handler {
 type HandlerServer interface {
 	UpServer()
 	routs()
+
+	UpdateMetricJSON(res http.ResponseWriter, req *http.Request)
+	ValueMetricJSON(res http.ResponseWriter, req *http.Request)
+
+	ValueMetrics(res http.ResponseWriter, req *http.Request)
 	UpdateMetric(res http.ResponseWriter, req *http.Request)
+	ValueMetric(res http.ResponseWriter, req *http.Request)
+
+	ResponseValueJSON(res http.ResponseWriter, metric, name string)
 }
 
 type Handler struct {
@@ -35,8 +43,10 @@ func (h *Handler) UpServer() {
 	logger.Initialize()
 
 	router := mux.NewRouter()
-	router.Handle(`/update/`, logger.RequestLogger(h.UpdateMetric))
-	router.Handle(`/value/`, logger.RequestLogger(h.ValueMetric))
+	router.Handle(`/update/`, logger.RequestLogger(h.UpdateMetricJSON))
+	router.Handle(`/value/`, logger.RequestLogger(h.ValueMetricJSON))
+	router.Handle(`/update/{metric}/{name}/{value}`, logger.RequestLogger(h.UpdateMetric))
+	router.Handle(`/value/{metric}/{name}`, logger.RequestLogger(h.ValueMetric))
 	router.Handle(`/`, logger.RequestLogger(h.ValueMetrics))
 
 	logger.Log.Info("Running server", zap.String("address", h.cnf.FlagRunAddr))
@@ -45,6 +55,48 @@ func (h *Handler) UpServer() {
 }
 
 func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	metric := vars["metric"]
+	name := vars["name"]
+	value := vars["value"]
+
+	err := h.logic.ProcessingMetric(metric, name, value)
+	if err != nil {
+		if errors.Is(err, constants.ErrBadRequest) {
+			http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+
+		}
+		if errors.Is(err, constants.ErrStatusNotFound) {
+			http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	res.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	metric := vars["metric"]
+	name := vars["name"]
+	value, err := h.logic.ValueMetric(metric, name)
+
+	if err != nil {
+		if errors.Is(err, constants.ErrStatusNotFound) {
+			http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+		return
+	}
+
+	_, err = res.Write([]byte(value))
+	if err != nil {
+		return
+	}
+
+	res.WriteHeader(http.StatusOK)
+
+}
+
+func (h *Handler) UpdateMetricJSON(res http.ResponseWriter, req *http.Request) {
 	var metricJSON constants.Metrics
 	var buf bytes.Buffer
 	var value string
@@ -71,7 +123,9 @@ func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 	default:
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
+
 	err = h.logic.ProcessingMetric(metric, name, value)
+
 	if err != nil {
 		if errors.Is(err, constants.ErrBadRequest) {
 			http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -83,9 +137,11 @@ func (h *Handler) UpdateMetric(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
+	h.ResponseValueJSON(res, metric, name)
+
 }
 
-func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
+func (h *Handler) ValueMetricJSON(res http.ResponseWriter, req *http.Request) {
 	var metricJSON constants.Metrics
 	var buf bytes.Buffer
 
@@ -103,11 +159,11 @@ func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
 
 	metric := metricJSON.ID
 	name := metricJSON.MType
-	h.ValueMetricJSON(res, metric, name)
+	h.ResponseValueJSON(res, metric, name)
 
 }
 
-func (h *Handler) ValueMetricJSON(res http.ResponseWriter, metric, name string) {
+func (h *Handler) ResponseValueJSON(res http.ResponseWriter, metric, name string) {
 
 	obj, err := h.logic.ValueMetricJSON(metric, name)
 	if err != nil {

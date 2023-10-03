@@ -124,7 +124,7 @@ func (h *Handler) UpdateMetricJSON(res http.ResponseWriter, req *http.Request) {
 	default:
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
-	fmt.Println(value)
+	fmt.Println(name, value)
 	err = h.logic.ProcessingMetric(metric, name, value)
 
 	if err != nil {

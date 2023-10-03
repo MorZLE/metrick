@@ -24,7 +24,7 @@ type Handler struct {
 }
 
 func (h *Handler) Request(obj constants.Metrics, port string) {
-	uri := fmt.Sprintf("http://%s/update", port)
+	uri := fmt.Sprintf("http://%s/update/", port)
 	log.Println("uri", uri)
 	body, err := json.Marshal(obj)
 	if err != nil {

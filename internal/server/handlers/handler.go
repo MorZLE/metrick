@@ -112,10 +112,10 @@ func (h *Handler) UpdateMetricJSON(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	metric := metricJSON.ID
-	name := metricJSON.MType
+	name := metricJSON.ID
+	metric := metricJSON.MType
 
-	switch metricJSON.ID {
+	switch metric {
 	case "gauge":
 		value = strconv.FormatFloat(*metricJSON.Value, 'f', -1, 64)
 	case "counter":
@@ -157,8 +157,8 @@ func (h *Handler) ValueMetricJSON(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	metric := metricJSON.ID
-	name := metricJSON.MType
+	name := metricJSON.ID
+	metric := metricJSON.MType
 
 	h.ResponseValueJSON(res, metric, name)
 
@@ -171,7 +171,7 @@ func (h *Handler) ResponseValueJSON(res http.ResponseWriter, metric, name string
 		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	resp, err := json.Marshal(obj)
+	resp, err := json.Marshal(&obj)
 	if err != nil {
 		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -179,7 +179,11 @@ func (h *Handler) ResponseValueJSON(res http.ResponseWriter, metric, name string
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Accept", "application/json")
 	res.WriteHeader(http.StatusOK)
-	res.Write(resp)
+
+	_, err = res.Write(resp)
+	if err != nil {
+		return
+	}
 
 }
 

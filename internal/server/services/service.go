@@ -98,14 +98,14 @@ func (s *Service) GetAllMetrics() string {
 	return metrics
 
 }
-
 func (s *Service) ValueMetricJSON(metric, name string) (constants.Metrics, error) {
 	val, err := s.ValueMetric(metric, name)
 	if errors.Is(err, constants.ErrStatusNotFound) {
 		return constants.Metrics{}, constants.ErrStatusNotFound
-
 	}
-	if metric == "counter" {
+
+	switch metric {
+	case "counter":
 		num, err := strconv.ParseInt(val, 10, 64)
 		if err != nil {
 			return constants.Metrics{}, constants.ErrParseInt
@@ -115,8 +115,7 @@ func (s *Service) ValueMetricJSON(metric, name string) (constants.Metrics, error
 			MType: "counter",
 			Delta: &num,
 		}, nil
-	}
-	if metric == "gauge" {
+	case "gauge":
 		num, err := strconv.ParseFloat(val, 64)
 		if err != nil {
 			return constants.Metrics{}, constants.ErrParseFloat
@@ -126,6 +125,7 @@ func (s *Service) ValueMetricJSON(metric, name string) (constants.Metrics, error
 			MType: "gauge",
 			Value: &num,
 		}, nil
+	default:
+		return constants.Metrics{}, constants.ErrStatusNotFound
 	}
-	return constants.Metrics{}, constants.ErrStatusNotFound
 }

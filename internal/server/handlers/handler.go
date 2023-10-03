@@ -43,8 +43,8 @@ func (h *Handler) UpServer() {
 	logger.Initialize()
 
 	router := mux.NewRouter()
-	router.Handle(`/update/`, logger.RequestLogger(h.UpdateMetricJSON))
-	router.Handle(`/value/`, logger.RequestLogger(h.ValueMetricJSON))
+	router.Handle(`/update`, logger.RequestLogger(h.UpdateMetricJSON))
+	router.Handle(`/value`, logger.RequestLogger(h.ValueMetricJSON))
 	router.Handle(`/update/{metric}/{name}/{value}`, logger.RequestLogger(h.UpdateMetric))
 	router.Handle(`/value/{metric}/{name}`, logger.RequestLogger(h.ValueMetric))
 	router.Handle(`/`, logger.RequestLogger(h.ValueMetrics))

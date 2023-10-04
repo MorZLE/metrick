@@ -10,9 +10,9 @@ import (
 )
 
 func NewSender() Handler {
-	t := http.DefaultTransport.(*http.Transport).Clone()
-	t.DisableKeepAlives = true
-	return Handler{client: http.Client{Transport: t}}
+	//t := http.DefaultTransport.(*http.Transport).Clone()
+	//t.DisableKeepAlives = true
+	return Handler{client: http.Client{}}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest

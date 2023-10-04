@@ -3,8 +3,10 @@ package services
 import (
 	"fmt"
 	"github.com/MorZLE/metrick/config"
+	"github.com/MorZLE/metrick/internal/client/constants"
 	"github.com/MorZLE/metrick/internal/client/handlers"
 	"github.com/MorZLE/metrick/internal/client/storages"
+	"log"
 	"strconv"
 	"time"
 )
@@ -44,11 +46,19 @@ func (s *Service) UpClient() {
 func (s *Service) SendRequest() {
 	mGouge := s.metric.GetMGauge()
 	for k, v := range mGouge {
-		s.handler.Request("gauge", k, fmt.Sprint(v), s.cnf.FlagAddr)
+		num, err := strconv.ParseFloat(fmt.Sprint(v), 64)
+		if err != nil {
+			log.Println(err)
+		}
+		req := constants.Metrics{ID: k, MType: "gauge", Value: &num}
+		s.handler.Request(req, s.cnf.FlagAddr)
+
 	}
 	mCounter := s.metric.GetMCounter()
 	for k, v := range mCounter {
-		s.handler.Request("counter", k, strconv.Itoa(v), s.cnf.FlagAddr)
+		num := int64(v)
+		req := constants.Metrics{ID: k, MType: "counter", Delta: &num}
+		s.handler.Request(req, s.cnf.FlagAddr)
 	}
 
 }

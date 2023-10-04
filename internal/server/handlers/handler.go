@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/MorZLE/metrick/config"
 	"github.com/MorZLE/metrick/internal/constants"
 	"github.com/MorZLE/metrick/internal/logger"
@@ -10,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func NewHandler(l services.ServiceInterface, cnf *config.ConfigServer) Handler {
@@ -20,7 +24,15 @@ func NewHandler(l services.ServiceInterface, cnf *config.ConfigServer) Handler {
 type HandlerServer interface {
 	UpServer()
 	routs()
+
+	UpdateMetricJSON(res http.ResponseWriter, req *http.Request)
+	ValueMetricJSON(res http.ResponseWriter, req *http.Request)
+
+	ValueMetrics(res http.ResponseWriter, req *http.Request)
 	UpdateMetric(res http.ResponseWriter, req *http.Request)
+	ValueMetric(res http.ResponseWriter, req *http.Request)
+
+	ResponseValueJSON(res http.ResponseWriter, metric, name string)
 }
 
 type Handler struct {
@@ -32,6 +44,8 @@ func (h *Handler) UpServer() {
 	logger.Initialize()
 
 	router := mux.NewRouter()
+	router.Handle(`/update/`, logger.RequestLogger(h.UpdateMetricJSON))
+	router.Handle(`/value/`, logger.RequestLogger(h.ValueMetricJSON))
 	router.Handle(`/update/{metric}/{name}/{value}`, logger.RequestLogger(h.UpdateMetric))
 	router.Handle(`/value/{metric}/{name}`, logger.RequestLogger(h.ValueMetric))
 	router.Handle(`/`, logger.RequestLogger(h.ValueMetrics))
@@ -80,6 +94,97 @@ func (h *Handler) ValueMetric(res http.ResponseWriter, req *http.Request) {
 	}
 
 	res.WriteHeader(http.StatusOK)
+
+}
+
+func (h *Handler) UpdateMetricJSON(res http.ResponseWriter, req *http.Request) {
+	var metricJSON constants.Metrics
+	var buf bytes.Buffer
+	var value string
+	// читаем тело запроса
+	_, err := buf.ReadFrom(req.Body)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err = json.Unmarshal(buf.Bytes(), &metricJSON); err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	name := metricJSON.ID
+	metric := metricJSON.MType
+
+	switch metric {
+	case "gauge":
+		value = strconv.FormatFloat(*metricJSON.Value, 'f', -1, 64)
+	case "counter":
+		value = strconv.FormatInt(*metricJSON.Delta, 10)
+	default:
+		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	}
+	fmt.Println(name, value)
+	err = h.logic.ProcessingMetric(metric, name, value)
+
+	if err != nil {
+		if errors.Is(err, constants.ErrBadRequest) {
+			http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+
+		}
+		if errors.Is(err, constants.ErrStatusNotFound) {
+			http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
+	h.ResponseValueJSON(res, metric, name)
+
+}
+
+func (h *Handler) ValueMetricJSON(res http.ResponseWriter, req *http.Request) {
+	var metricJSON constants.Metrics
+	var buf bytes.Buffer
+
+	// читаем тело запроса
+	_, err := buf.ReadFrom(req.Body)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	if err = json.Unmarshal(buf.Bytes(), &metricJSON); err != nil {
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	name := metricJSON.ID
+	metric := metricJSON.MType
+
+	h.ResponseValueJSON(res, metric, name)
+
+}
+
+func (h *Handler) ResponseValueJSON(res http.ResponseWriter, metric, name string) {
+
+	obj, err := h.logic.ValueMetricJSON(metric, name)
+	if errors.Is(err, constants.ErrStatusNotFound) {
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	resp, err := json.Marshal(&obj)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	res.Header().Set("Content-Type", "application/json")
+	//res.Header().Set("Accept", "application/json")
+	res.WriteHeader(http.StatusOK)
+
+	_, err = res.Write(resp)
+	if err != nil {
+		return
+	}
 
 }
 

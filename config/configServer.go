@@ -17,7 +17,7 @@ type ConfigServer struct {
 
 func ParseFlagsServer(cnf *ConfigServer) *ConfigServer {
 
-	flag.StringVar(&cnf.FlagRunAddr, "a", ":8080", "address and port to run server")
+	flag.StringVar(&cnf.FlagRunAddr, "a", "127.0.0.1:8080", "address and port to run server")
 
 	flag.Parse()
 

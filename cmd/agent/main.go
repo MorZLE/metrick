@@ -16,7 +16,7 @@ func main() {
 	logic := services.NewService(&repo, &h, cnf)
 
 	// Add logging statements
-	log.Println("Starting UpClient...")
+	log.Println("Starting UpClient...", cnf.FlagAddr)
 	logic.UpClient()
 	log.Println("UpClient complete.")
 }

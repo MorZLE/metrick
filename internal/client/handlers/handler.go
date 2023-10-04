@@ -11,7 +11,9 @@ import (
 )
 
 func NewSender() Handler {
-	return Handler{client: http.Client{Timeout: 10 * time.Second}}
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.DisableKeepAlives = true
+	return Handler{client: http.Client{Timeout: 100 * time.Millisecond, Transport: t}}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest

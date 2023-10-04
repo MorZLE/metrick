@@ -7,13 +7,12 @@ import (
 	"github.com/MorZLE/metrick/internal/client/constants"
 	"log"
 	"net/http"
-	"time"
 )
 
 func NewSender() Handler {
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.DisableKeepAlives = true
-	return Handler{client: http.Client{Timeout: 100 * time.Millisecond, Transport: t}}
+	return Handler{client: http.Client{Transport: t}}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest

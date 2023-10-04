@@ -178,7 +178,7 @@ func (h *Handler) ResponseValueJSON(res http.ResponseWriter, metric, name string
 		return
 	}
 	res.Header().Set("Content-Type", "application/json")
-	res.Header().Set("Accept", "application/json")
+	//res.Header().Set("Accept", "application/json")
 	res.WriteHeader(http.StatusOK)
 
 	_, err = res.Write(resp)

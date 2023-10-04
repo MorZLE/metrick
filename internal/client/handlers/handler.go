@@ -11,7 +11,7 @@ import (
 )
 
 func NewSender() Handler {
-	return Handler{client: http.Client{Timeout: 3 * time.Second}}
+	return Handler{client: http.Client{Timeout: 10 * time.Second}}
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=HandleRequest
@@ -33,20 +33,20 @@ func (h *Handler) Request(obj constants.Metrics, port string) {
 	}
 	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err)
+		log.Println("Ошибка создания запроса", err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := h.client.Do(req)
 	if err != nil {
-		log.Println(err)
+		log.Println("Ошибка выполнения запроса", err)
 		return
 	}
 
 	err = resp.Body.Close()
 	if err != nil {
-		log.Println(err)
+		log.Println("Ошибка закрытия body", err)
 		return
 	}
 
